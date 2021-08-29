@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <script src="./ehrbundle.js"></script>
+    <script>
+        function prepare_log(type) {
+            var info = {}, accountNum;
+            info.type = type;
+            accountNum = parseInt(document.getElementById('num').value);
+
+            send_message(info, accountNum, "get_log");
+        }
+    </script>
+        <div style="text-align: center; padding:100px;">
+            _계정 번호 :      <input type="text" id="num" value="1"/> <br />
+
+            <br />
+                    <button class="btn btn-default" id="upload_log_button" type="button"
+                    onClick="prepare_log('upload')">업로드 로그!</button>
+                    <button class="btn btn-default" id="retrieve_log_button" type="button"
+                    onClick="prepare_log('retrieve')">가져오기 로그!</button>
+                    <button class="btn btn-default" id="penalty_log_button" type="button"
+                    onClick="prepare_log('penalty')">의도하지 않은 접근 로그!</button>
+            <br />
+            <span id="log-text"></span>
+
+
+        </div>
+    </body>
+</html>
