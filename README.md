@@ -15,7 +15,7 @@ This project is about the EHR system implementation. The overall structure is ba
 
 ### Run environment
 * Ganache + Remix
-* accounts[3] for EHRs manager and accounts[4] for ipfs server are fixed.
+* The role of accounts[3], [4] and [9] are fixed. Accounts[3] for EHRs manager , accounts[4] for ipfs server and accounts[9] for admin.
 * After deploying the contract, modify address.txt and abi.tex.
 
 ## Result
