@@ -15,8 +15,8 @@ This project is about the EHR system implementation. The overall structure is ba
 
 ### Run environment
 * Ganache + Remix
-* The role of accounts[3], [4] and [9] are fixed. Accounts[3] for EHRs manager , accounts[4] for ipfs server and accounts[9] for admin.
-* After deploying the contract, modify address.txt and abi.tex.
+* The role of accounts[3], [4] and [9] are fixed. Accounts[3] for EHRs manager , accounts[4] for ipfs server and accounts[9] for admin. You can change the role by modifying server/utils.py, admin/utils.py and ipfs/utils.py
+* After deploying the contract, modify address.txt and abi.tex if it is necessary.
 
 ## Result
 \<upload\><br/><br/>
@@ -27,3 +27,6 @@ This project is about the EHR system implementation. The overall structure is ba
 <img width="80%" src="https://user-images.githubusercontent.com/81351772/131261757-cefa6930-057a-4758-aab8-438d167294aa.png"/><br/><br/>
 \<log\><br/><br/>
 <img width="80%" src="https://user-images.githubusercontent.com/81351772/131261760-510716a0-7375-4aa5-bed1-3f761d11f8ab.png"/><br/><br/>
+
+## Bugs
+* The DataResult event is not emitted for some reasons.
