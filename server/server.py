@@ -131,7 +131,7 @@ async def retrieve_request(sid, data):
     except exceptions.ContractLogicError as err:
         # The user isn't registered or doesn't have data(CID) or the data user has penalty.
         await sio.emit('retrieve_request_result', {'result': False, 'err': str(err)}, room=sid)
-        ehr.functions.retrieveResult(info["target"], userAddress, False).transact()
+        ehr.functions.retrieveResult(info["target"], userAddress, True).transact()
         printLog('retrieve', {'address': userAddress, 'result': False, 'err': str(err)})
 
 

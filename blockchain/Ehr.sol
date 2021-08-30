@@ -79,7 +79,7 @@ contract EHR {
         emit DataAdded(dataOwner, block.timestamp);
     }
 
-    function retrieve(address dataOwner, address dataUser) public isExist(dataOwner) isExist(dataUser) onlyManager returns(bytes memory) {
+    function retrieve(address dataOwner, address dataUser) public view isExist(dataOwner) isExist(dataUser) onlyManager returns(bytes memory) {
         require(users[dataUser].isPenalty == false, "The data user has penalty!");
         require(keccak256(users[dataOwner].cid) != keccak256(emptyBytes), "data owner doesn't have a data.");
         

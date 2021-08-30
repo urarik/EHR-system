@@ -3,10 +3,10 @@ This project is about the EHR system implementation. The overall structure is ba
 
 ## Sequence diagram
   \<upload\><br/><br/>
-<img width="80%" src="https://user-images.githubusercontent.com/81351772/131261747-8a98fdaf-199f-4f4f-807e-27446a7d4bfb.png"/><br/><br/>
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/131285888-bfb93207-b02a-4795-b484-9a242785575e.png"/><br/><br/>
   \<retrieve\><br/><br/>
-<img width="80%" src="https://user-images.githubusercontent.com/81351772/131261748-1939742f-c63d-40aa-8c5f-b785c896fdb5.png"/>
-   
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/131285891-122ff0f7-a3f9-4dda-9fc2-e7cb3c0e2091.png"/>
+
 ## Environment
 ### Program language
 * EHRs manager (main server), ipfs server : python.
@@ -15,8 +15,8 @@ This project is about the EHR system implementation. The overall structure is ba
 
 ### Run environment
 * Ganache + Remix
-* accounts[3] for EHRs manager and accounts[4] for ipfs server are fixed.
-* After deploying the contract, modify address.txt and abi.tex.
+* The role of accounts[3], [4] and [9] are fixed. Accounts[3] for EHRs manager , accounts[4] for ipfs server and accounts[9] for admin. You can change the role by modifying server/utils.py, admin/utils.py and ipfs/utils.py
+* After deploying the contract, modify address.txt and abi.tex if it is necessary.
 
 ## Result
 \<upload\><br/><br/>
@@ -27,3 +27,6 @@ This project is about the EHR system implementation. The overall structure is ba
 <img width="80%" src="https://user-images.githubusercontent.com/81351772/131261757-cefa6930-057a-4758-aab8-438d167294aa.png"/><br/><br/>
 \<log\><br/><br/>
 <img width="80%" src="https://user-images.githubusercontent.com/81351772/131261760-510716a0-7375-4aa5-bed1-3f761d11f8ab.png"/><br/><br/>
+
+## Bugs
+* The DataResult event is not emitted for some reasons.
