@@ -3,10 +3,10 @@ This project is about the EHR system implementation. The overall structure is ba
 
 ## Sequence diagram
   \<upload\><br/><br/>
-<img width="80%" src="https://user-images.githubusercontent.com/81351772/131261747-8a98fdaf-199f-4f4f-807e-27446a7d4bfb.png"/><br/><br/>
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/131285888-bfb93207-b02a-4795-b484-9a242785575e.png"/><br/><br/>
   \<retrieve\><br/><br/>
-<img width="80%" src="https://user-images.githubusercontent.com/81351772/131261748-1939742f-c63d-40aa-8c5f-b785c896fdb5.png"/>
-   
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/131285891-122ff0f7-a3f9-4dda-9fc2-e7cb3c0e2091.png"/>
+
 ## Environment
 ### Program language
 * EHRs manager (main server), ipfs server : python.
