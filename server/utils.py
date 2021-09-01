@@ -27,6 +27,10 @@ class Errors:
     def noMatchTypeError(logType):
         return f"{logType} is not supported!"
 
+    class NoElementError(Exception):
+        def __init__(self):
+            super().__init__('There is no data granted permission from the owner or the owner doesn\'t have a data.')
+
 
 def timestamp():
     return datetime.datetime.now().timestamp()

@@ -1,7 +1,6 @@
 pragma solidity ^0.8.7;
 
 contract EHR {
-    address[] waitingList; //회원가입 대기자
     address private admin;
     address private ehrManager;
     address private ipfs;
@@ -14,14 +13,21 @@ contract EHR {
     event DataResult(address indexed to, address _from, uint time);
     event PenaltyResult(address indexed to, address _from, uint time);
 
-    struct User {
+    struct Data {
+        string name;
         bytes cid;
+    }
+    struct User {
+        string[] dataNames;
+        mapping(string => bytes) cid;
+        uint8 lastModified;
         string role;
         bool isUploading;
         bool isPenalty;
     }
     mapping(address => User) public users;
-    mapping(address => mapping(address => bool)) ACL;
+    //owner => user => data name
+    mapping(address => mapping(address => mapping(string => bool))) ACL;
 
     constructor(address _ehrManager, address _ipfs) {
         admin = msg.sender;
@@ -47,20 +53,13 @@ contract EHR {
         _;
     }
 
-    function getWaitingList() public view onlyAdmin returns(address[] memory) {
-        return waitingList;
-    }
-
-    function registerConfirm(uint index, string memory _userRole, bool is_approved) public onlyAdmin {
-        if(is_approved) users[waitingList[index]] = User("", _userRole, false, false);
-        waitingList[index] = waitingList[waitingList.length-1];
-        waitingList.pop();
-    }
-
-    function addUser(address userAddress, string memory userRole) public onlyAdmin returns(User memory){
-        users[userAddress] = User("", userRole, false, false);
+    function addUser(address userAddress, string memory userRole) public onlyAdmin {
+        User storage user = users[userAddress];
+        user.isPenalty = false;
+        user.isUploading = false;
+        user.lastModified = 0;
+        user.role = userRole;
         emit UserAdded(userAddress, userRole);
-        return users[userAddress];
     }
 
     function deleteUser(address userAddress) public onlyAdmin {
@@ -73,22 +72,37 @@ contract EHR {
     function getPermission(address dataOwner) public view isExist(dataOwner) onlyIpfs returns(bool){
         return users[dataOwner].isUploading;
     }
-    function updateUploadingResult(address dataOwner, bytes memory _cid) public onlyManager {
-        users[dataOwner].cid = _cid;
-        users[dataOwner].isUploading = false;
-        emit DataAdded(dataOwner, block.timestamp);
+    function getDataNames(address dataOwner) public view isExist(dataOwner) onlyManager returns(string [] memory) {
+        return users[dataOwner].dataNames;
     }
 
-    function retrieve(address dataOwner, address dataUser) public view isExist(dataOwner) isExist(dataUser) onlyManager returns(bytes memory) {
-        require(users[dataUser].isPenalty == false, "The data user has penalty!");
-        require(keccak256(users[dataOwner].cid) != keccak256(emptyBytes), "data owner doesn't have a data.");
+    function updateUploadingResult(address dataOwner, string[] memory names, bytes[] memory cids) public onlyManager {
         
-        if(ACL[dataOwner][dataUser] != false || dataOwner == dataUser) {
-            return users[dataOwner].cid;
+        if(users[dataOwner].isUploading){
+            for(uint i = 0; i < names.length; ++i){
+                if(keccak256(users[dataOwner].cid[names[i]]) == keccak256(emptyBytes)) {
+                    users[dataOwner].cid[names[i]] = cids[i];
+                    users[dataOwner].dataNames.push(names[i]);
+                }
+                else {
+                    users[dataOwner].cid[names[i]] = cids[i];
+                }
+            }
+            users[dataOwner].isUploading = false;
+            emit DataAdded(dataOwner, block.timestamp);
         }
-        else{
-            revert("data owner didn't grant permission to data user.");
+    }
+
+    function retrieve(address dataOwner, address dataUser, string[] memory names) public view isExist(dataOwner) isExist(dataUser) onlyManager returns(bytes []memory) {
+        require(users[dataUser].isPenalty == false, "The data user has penalty!");
+        bytes[] memory cids;
+        uint cnt = 0;
+        for(uint i =0; i < names.length; ++i) {
+            if(ACL[dataOwner][dataUser][names[i]] == false) revert("The data owner didn't grant permission to data user.");
+            if(keccak256(users[dataOwner].cid[names[i]]) == keccak256(emptyBytes)) revert("The data owner doesn't have a data.");
+            cids[cnt] = (users[dataOwner].cid[names[i]]);
         }
+        return cids;
     }
     function retrieveResult(address dataOwner, address dataUser, bool _isPenalty) public onlyManager {
         if(_isPenalty){
@@ -98,8 +112,11 @@ contract EHR {
             emit DataResult(dataOwner, dataUser, block.timestamp);
     }
 
-    function grantPermission(address dataOwner, address dataUser) public isExist(dataOwner) isExist(dataUser) onlyManager {
-        ACL[dataOwner][dataUser] = true;
+    function grantPermission(address dataOwner, address dataUser, string[] memory names) public isExist(dataOwner) isExist(dataUser) onlyManager {
+        for(uint i =0; i < names.length; ++i) {
+            if(keccak256(users[dataOwner].cid[names[i]]) == keccak256(emptyBytes)) revert("The user doesn't have a data.");
+            ACL[dataOwner][dataUser][names[i]] = true;
+        }
     }
     function setPenalty(address user, bool _isPanelty) public isExist(user) onlyAdmin {
         users[user].isPenalty = _isPanelty;   

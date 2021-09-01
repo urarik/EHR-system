@@ -28,10 +28,16 @@ def upload(sid, data):  # called by user
     userAddress = recover(data["info"], data["sig"])
     if ehr.functions.getPermission(userAddress).call():
         # A ipfs.add() accepts only file.
-        with open('temp.txt', 'wb') as f:
-            f.write(data["data"])
-        cid = ipfs.add('temp.txt')
-        info = {'cid': cid["Hash"], 'address': userAddress, 'timestamp': timestamp()}
+        names = []
+        cids = []
+        for name, encryptedData in getInfo(data):
+            with open('temp.txt', 'wb') as f:
+                f.write(encryptedData)
+            cid = ipfs.add('temp.txt')
+            names.append(name)
+            cids.append(cid.encode('utf-8'))
+
+        info = {'results': (names, cids), 'address': userAddress, 'timestamp': timestamp()}
         result = True
     else:
         info = {'address': userAddress, 'timestamp': timestamp(), 'err': Errors.noPermissionError}
@@ -41,6 +47,13 @@ def upload(sid, data):  # called by user
     serverSocket.emit('upload_result', {'result': result, 'info': info_json, 'sig': sig})
     printLog("upload", {'address': userAddress, 'result': result, "timestamp": timestamp()})
     # user -> EHRm -> SC -> EHRm -> user -> IPFS -CID-> [EHRm -> user]
+
+
+def getInfo(data):
+    nameList = data["names"]
+    dataList = data["data"]
+    for i in range(len(nameList)):
+        yield nameList[i], dataList[i]
 
 
 @sio.event

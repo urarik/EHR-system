@@ -1,32 +1,46 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-    </head>
-    <body>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
     <script src="./ehrbundle.js"></script>
     <script>
-        async function prepare_grant() {
-            var info = {}, accountNum;
-            var targetNum = document.getElementById('target').value;
-            info.target = await getAddress(targetNum);
-            accountNum = parseInt(document.getElementById('num').value);
+      async function prepare_grant(type) {
+        console.log(type)
+        var info = {},
+          accountNum;
+        var targetNum = document.getElementById("target").value;
+        info.target = await getAddress(targetNum);
+        accountNum = parseInt(document.getElementById("num").value);
 
-            send_message(info, accountNum, "grant_permission");
+        if(type == "grant_button")
+          send_message(info, accountNum, "grant_permission");
+        else{
+          info.type = 'grant';
+          send_message(info, accountNum, "get_data_name");
         }
+      }
     </script>
-        <div style="text-align: center; padding:100px;">
-            타겟 이더리움 주소 :      <input type="text" id="target" value="2"/> <br />
-            _계정 번호 :      <input type="text" id="num" value="1"/> <br />
+    <div style="text-align: center; padding: 100px">
+      타겟 이더리움 주소 : <input type="text" id="target" value="2" /> <br />
+      _계정 번호 : <input type="text" id="num" value="1" /> <br />
 
-            <br />
-            <button class="btn btn-default" id="grant_button" type="button"
-                    onClick="prepare_grant()">요청!</button>
-            <br />
-            <span id="grant-result-text"></span>
+      <br />
+      <input type="checkbox" name="grant-data" value="grant-data1"/> 
+      <span id="grant-data1"></span>
+      <input type="checkbox" name="grant-data" value="grant-data2"/>
+      <span id="grant-data1"></span> 
+      <input type="checkbox" name="grant-data" value="grant-data3"/> 
+      <span id="grant-data1"></span>
+      <br />
 
-
-        </div>
-    </body>
+      <button class="btn btn-default" id="get_grant_button" type="button" onClick="prepare_grant(this.id)"> 로드!  
+      <button class="btn btn-default" id="grant_button" type="button" onClick="prepare_grant(this.id)"> 요청!
+      </button>
+      <br />
+      <span id="grant-result-text"></span>
+    </div>
+  </body>
 </html>

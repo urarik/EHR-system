@@ -85,8 +85,10 @@ async def upload_result(sid, data):
         _ipfsAccount = recover(data["info"], data["sig"])
         if _ipfsAccount == ipfsAccount:
             try:
-                encryptedCid = key.encrypt(info["cid"].encode('utf-8'))
-                ehr.functions.updateUploadingResult(info["address"], encryptedCid).transact()
+                (names, cids) = info["results"]
+                for i in range(len(names)):
+                    cids[i] = key.encrypt(cids[i])
+                ehr.functions.updateUploadingResult(info["address"], names, cids).transact()
             except (OverflowError, exceptions.ContractLogicError) as err:
                 # The message is too big to encrypt it or a transaction error.
                 await sio.emit('upload_result', {'result': False, 'err': str(err)}, room=userSid)
@@ -142,8 +144,8 @@ async def retrieve_result(sid, data):
 
     :param data: {info: {timestamp, address: user address}, sig: signature, data: encrypted data}
     """
-    _ipfsAccount = recover(data["info"], data["sig"])
-    if _ipfsAccount == ipfsAccount:
+    _ipfsAddress = recover(data["info"], data["sig"])
+    if _ipfsAddress == ipfsAccount:
         info = json.loads(data["info"])
         try:
             original_data = key.decrypt(data["data"]).decode('utf-8')
@@ -158,6 +160,23 @@ async def retrieve_result(sid, data):
             printLog('retrieve_result', {'result': False, 'err': str(err)})
 
         del sidDict[info["address"]]
+
+
+@sio.event
+async def get_data_name(sid, data):
+    userAddress = recover(data["info"], data["sig"])
+    info = json.loads(data["info"])
+    try:
+        dataList = ehr.functions.get_data_name(info["target"], userAddress)
+        if len(dataList) == 0:
+            raise Errors.NoElementError
+        await sio.emit('get_data_name_result', {'result': True, 'type': info["type"], 'data': dataList})
+        printLog('get_data_name_result', {'result': False})
+
+    except (exceptions.ContractLogicError, Errors.NoElementError) as err:
+        await sio.emit('get_data_name_result', {'result': False, 'err': str(err)})
+        printLog('get_data_name_result', {'result': False, 'type': info["type"], 'err': str(err)})
+
 
 
 @sio. event
