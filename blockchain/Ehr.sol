@@ -5,7 +5,7 @@ contract EHR {
     address private ehrManager;
     address private ipfs;
     bytes32 constant emptyStringBytes = keccak256(bytes(""));
-    bytes constant emptyBytes = "0x0";
+    bytes constant emptyBytes = bytes("");
 
     event UserAdded(address userAddress, string userRole);
     event UserRemoved(address userAddress);
@@ -13,13 +13,8 @@ contract EHR {
     event DataResult(address indexed to, address _from, uint time);
     event PenaltyResult(address indexed to, address _from, uint time);
 
-    struct Data {
-        string name;
-        bytes cid;
-    }
     struct User {
         string[] dataNames;
-        mapping(string => bytes) cid;
         uint8 lastModified;
         string role;
         bool isUploading;
@@ -28,6 +23,7 @@ contract EHR {
     mapping(address => User) public users;
     //owner => user => data name
     mapping(address => mapping(address => mapping(string => bool))) ACL;
+    mapping(address => mapping(string => bytes)) cid; //change bytes to fixed bytes?
 
     constructor(address _ehrManager, address _ipfs) {
         admin = msg.sender;
@@ -72,20 +68,31 @@ contract EHR {
     function getPermission(address dataOwner) public view isExist(dataOwner) onlyIpfs returns(bool){
         return users[dataOwner].isUploading;
     }
-    function getDataNames(address dataOwner) public view isExist(dataOwner) onlyManager returns(string [] memory) {
+    function getDataNamesGrant(address dataOwner) public view isExist(dataOwner) onlyManager returns(string [] memory) {
         return users[dataOwner].dataNames;
+    }
+    function getDataNamesRetrieve(address dataOwner, address dataUser) public view isExist(dataOwner) onlyManager returns(string [] memory) {
+        string[] memory names = users[dataOwner].dataNames;
+        string[] memory results = new string[](names.length);
+        uint cnt = 0;
+        for(uint i =0; i < names.length; ++i) {
+            if(ACL[dataOwner][dataUser][names[i]]) results[cnt++] = names[i];
+        }
+        return results;
+    }
+    function getCid(address dataOwner, string memory name) public view returns(bytes memory) {
+        return cid[dataOwner][name];
     }
 
     function updateUploadingResult(address dataOwner, string[] memory names, bytes[] memory cids) public onlyManager {
-        
         if(users[dataOwner].isUploading){
             for(uint i = 0; i < names.length; ++i){
-                if(keccak256(users[dataOwner].cid[names[i]]) == keccak256(emptyBytes)) {
-                    users[dataOwner].cid[names[i]] = cids[i];
+                if(keccak256(cid[dataOwner][names[i]]) == keccak256(emptyBytes)) {
+                    cid[dataOwner][names[i]] = cids[i];
                     users[dataOwner].dataNames.push(names[i]);
                 }
                 else {
-                    users[dataOwner].cid[names[i]] = cids[i];
+                    cid[dataOwner][names[i]] = cids[i];
                 }
             }
             users[dataOwner].isUploading = false;
@@ -95,12 +102,12 @@ contract EHR {
 
     function retrieve(address dataOwner, address dataUser, string[] memory names) public view isExist(dataOwner) isExist(dataUser) onlyManager returns(bytes []memory) {
         require(users[dataUser].isPenalty == false, "The data user has penalty!");
-        bytes[] memory cids;
+        bytes[] memory cids = new bytes[](names.length);
         uint cnt = 0;
         for(uint i =0; i < names.length; ++i) {
             if(ACL[dataOwner][dataUser][names[i]] == false) revert("The data owner didn't grant permission to data user.");
-            if(keccak256(users[dataOwner].cid[names[i]]) == keccak256(emptyBytes)) revert("The data owner doesn't have a data.");
-            cids[cnt] = (users[dataOwner].cid[names[i]]);
+            if(keccak256(cid[dataOwner][names[i]]) == keccak256(emptyBytes)) revert("The data owner doesn't have a data.");
+            cids[cnt++] = cid[dataOwner][names[i]];
         }
         return cids;
     }
@@ -114,7 +121,7 @@ contract EHR {
 
     function grantPermission(address dataOwner, address dataUser, string[] memory names) public isExist(dataOwner) isExist(dataUser) onlyManager {
         for(uint i =0; i < names.length; ++i) {
-            if(keccak256(users[dataOwner].cid[names[i]]) == keccak256(emptyBytes)) revert("The user doesn't have a data.");
+            if(keccak256(cid[dataOwner][names[i]]) == keccak256(emptyBytes)) revert("The user doesn't have a data.");
             ACL[dataOwner][dataUser][names[i]] = true;
         }
     }

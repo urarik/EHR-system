@@ -61,3 +61,10 @@ def printLog(type: string, content: dict):
     for key, value in content.items():
         print(str(key) + ": " + str(value))
     print()
+
+
+def indexOf(val, list):
+    try:
+        return list.index(val)
+    except ValueError:
+        return len(list)

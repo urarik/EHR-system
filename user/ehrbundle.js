@@ -35476,7 +35476,7 @@
         const io = require("socket.io-client");
         const EHRSocket = io.connect("http://localhost:8080");
         const IpfsSocket = io.connect("http://localhost:8088");
-
+        var i  = 0;
         getAddress = async function (accountNum) {
           accounts = await web3.eth.getAccounts();
           return accounts[accountNum];
@@ -35517,16 +35517,15 @@
               data["err"];
           else {
             var info = {};
-
             var index = 1;
+
             [1, 2, 3].forEach((i) => {
               var fr = new FileReader();
               fr.onload = function (progressEvent) {
-                var fileName = document.getElementById("data" + index).value;
-                info[fileName + index] = progressEvent.target.result;
+                var fileName = fr.name;
+                info[fileName] = progressEvent.target.result;
                 if (index == 3) {
                   var accountNum = document.getElementById("num").value;
-                  //JSON.stringify(info)
                   sendHealthData(info, accountNum, data["public"]);
                   return;
                 }
@@ -35535,8 +35534,9 @@
               var input = document.getElementById("file" + i);
               if (input.files.length != 0) {
                 var file = input.files[0];
+                fr.name = document.getElementById('data'+i).value;
                 fr.readAsBinaryString(file);
-              }
+              } else index++;
             });
           }
         });
@@ -35548,8 +35548,8 @@
           //accountNum: account number of the ganache accounts.
           //publicKey: EHRs manager's public key.
           var sig;
-          var timestamp = Date.now();
-          var encyrptedDataList = [], nameList = [];
+          var timestamp = Date.now().toString();
+          var encryptedDataList = [], nameList = [];
           for(const key in info) {
             var encryptedData = crypto.publicEncrypt(
               {
@@ -35560,7 +35560,7 @@
               buffer.from(info[key])
             );
             nameList.push(key);
-            encyrptedDataList.push(encryptedData);
+            encryptedDataList.push(encryptedData);
           }
 
           var accounts = await web3.eth.getAccounts();
@@ -35587,14 +35587,26 @@
 
         EHRSocket.on("get_data_name_result", (data) => {
           if(data["result"]) {
-            var type = data["type"]+'-data';
+            var type = data["type"];
             var dataList = data["data"];
+            var div = document.getElementById('div_'+type);
+            while(div.firstChild){ //clear
+              div.removeChild(div.firstChild);
+            }
 
-            for(var i=1; i <= dataList.length; ++i) {
-              document.getElementById(type + i).innerText = dataList[i-1];
+            for(var i=0; i < dataList.length; ++i) {
+              var checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
+              checkbox.id = 'chk'+type+i;
+              var span = document.createElement('span');
+              span.innerHTML = dataList[i];
+              span.id = 'span_'+type+i;
+              div.appendChild(span);
+              div.appendChild(checkbox);
             }
           }
           else {
+            console.log(type)
             var type = data["type"] + '-result-text';
             document.getElementById(type).innerText = data["err"];          
           }
@@ -35605,14 +35617,17 @@
           //Receives requested data with json formatted.
           if (data["result"]) {
             var text = "";
-            JSON.parse(
-              data["data"],
-              (key, value) => (text += key + ": " + value + "\n")
-            );
+            var data = data["data"];
+            for(var i = 0; i < data.length; ++i){
+              text += data[i][0] + "\n";
+              text += data[i][1];
+              text += "\n\n";
+            }
             document.getElementById("retrieve-result-text").innerText = text;
-          } else
-            document.getElementById("retrieve-result-text").innerText =
-              data["err"];
+          } else{
+            console.log(document.getElementById("retrieve-result-text"))
+            document.getElementById("retrieve-result-text").innerText = data["err"];
+          }
         });
 
         EHRSocket.on("grant_result", (data) => {
@@ -35620,8 +35635,7 @@
           if (data["result"])
             document.getElementById("grant-result-text").innerText = "Success!";
           else
-            document.getElementById("grant-result-text").innerText =
-              data["err"];
+            document.getElementById("grant-result-text").innerText = data["err"];
         });
 
         EHRSocket.on("log_result", (data) => {

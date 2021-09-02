@@ -8,17 +8,26 @@
     <script src="./ehrbundle.js"></script>
     <script>
       async function prepare_grant(type) {
-        console.log(type)
         var info = {},
           accountNum;
         var targetNum = document.getElementById("target").value;
         info.target = await getAddress(targetNum);
         accountNum = parseInt(document.getElementById("num").value);
 
-        if(type == "grant_button")
+        if(type == "grant_button") {
+          var names = [];
+          var div = document.getElementById('div_grant');
+          var divChks = div.getElementsByTagName('input');
+          for(var i =0; i < divChks.length; ++i) {
+            if(divChks[i].checked) {
+              names.push(document.getElementById('span_grant'+i).innerHTML);
+            }
+          }
+          info.names = names;
           send_message(info, accountNum, "grant_permission");
+        }
         else{
-          info.type = 'grant';
+          info.type = 'grant'; //grant or receive
           send_message(info, accountNum, "get_data_name");
         }
       }
@@ -28,17 +37,10 @@
       _계정 번호 : <input type="text" id="num" value="1" /> <br />
 
       <br />
-      <input type="checkbox" name="grant-data" value="grant-data1"/> 
-      <span id="grant-data1"></span>
-      <input type="checkbox" name="grant-data" value="grant-data2"/>
-      <span id="grant-data1"></span> 
-      <input type="checkbox" name="grant-data" value="grant-data3"/> 
-      <span id="grant-data1"></span>
-      <br />
-
-      <button class="btn btn-default" id="get_grant_button" type="button" onClick="prepare_grant(this.id)"> 로드!  
-      <button class="btn btn-default" id="grant_button" type="button" onClick="prepare_grant(this.id)"> 요청!
-      </button>
+      <div id="div_grant">
+      </div>
+      <button class="btn btn-default" id="get_grant_button" type="button" onClick="prepare_grant(this.id)"> 로드!</button>
+      <button class="btn btn-default" id="grant_button" type="button" onClick="prepare_grant(this.id)"> 요청!</button>
       <br />
       <span id="grant-result-text"></span>
     </div>
