@@ -1,5 +1,6 @@
 ## Introduction
 This project is about the EHR system implementation. The overall structure is based on Blockchain for Secure EHRs Sharing of Mobile Cloud Based E-Health Systems by Dinh C. Nguyen, Pubudu N. Pathirana, Ming Ding, Aruna Seneviratne.
+I used blockchain and ipfs to store data and access control.
 
 ## Sequence diagram
   \<upload\><br/><br/>
