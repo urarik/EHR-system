@@ -9,7 +9,7 @@ contract EHR {
 
     event UserAdded(address userAddress, string userRole);
     event UserRemoved(address userAddress);
-    event DataAdded(address indexed userAddress, uint time);
+    event DataAdded(address indexed userAddress, string dataName, uint time);
     event DataResult(address indexed to, address _from, uint time);
     event PenaltyResult(address indexed to, address _from, uint time);
 
@@ -94,9 +94,9 @@ contract EHR {
                 else {
                     cid[dataOwner][names[i]] = cids[i];
                 }
+                emit DataAdded(dataOwner, names[i], block.timestamp);
             }
             users[dataOwner].isUploading = false;
-            emit DataAdded(dataOwner, block.timestamp);
         }
     }
 
