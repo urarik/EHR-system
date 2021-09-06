@@ -20,13 +20,15 @@ This project is about the EHR system implementation. The overall structure is ba
 
 ## Result
 \<upload\><br/><br/>
-<img width="80%" src="https://user-images.githubusercontent.com/81351772/131261754-431e2da7-ca6b-4066-bd65-378bee585422.png"/><br/><br/>
+You can upload file to ipfs.
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/132211878-f9546ba9-fe96-4d9c-ab58-2e0ce89b266f.png"/><br/><br/>
 \<grant permission\><br/><br/>
-<img width="80%" src="https://user-images.githubusercontent.com/81351772/131261755-5b264923-0e1b-4624-aad9-adcec912048a.png"/><br/><br/>
+You can load files you uploaded and then grant permission to target user for each file.
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/132211881-51f8ced7-ff85-4799-bb9b-d8a0879a9ec6.png"/><br/><br/>
 \<retrieve\><br/><br/>
-<img width="80%" src="https://user-images.githubusercontent.com/81351772/131261757-cefa6930-057a-4758-aab8-438d167294aa.png"/><br/><br/>
+You can see data names allowed by owner and then see the contents you checked.
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/132211885-b54abeec-64a7-4974-9ca0-0dade0d40a1a.png"/><br/><br/>
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/132211888-b91fc251-6ec4-42dd-9bb4-c4e4dd6ee1f4.png"/><br/><br/>
 \<log\><br/><br/>
-<img width="80%" src="https://user-images.githubusercontent.com/81351772/131261760-510716a0-7375-4aa5-bed1-3f761d11f8ab.png"/><br/><br/>
-
-## Bugs
-* The DataResult event is not emitted for some reasons.
+You can see upload logs, retrieve logs and unaccepted retrieve logs.
+<img width="80%" src="https://user-images.githubusercontent.com/81351772/132211883-f46432cf-cca4-44b4-b430-b5826b404db3.png"/><br/><br/>
