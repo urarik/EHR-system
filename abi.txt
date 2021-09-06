@@ -130,35 +130,7 @@
 			}
 		],
 		"name": "addUser",
-		"outputs": [
-			{
-				"components": [
-					{
-						"internalType": "bytes",
-						"name": "cid",
-						"type": "bytes"
-					},
-					{
-						"internalType": "string",
-						"name": "role",
-						"type": "string"
-					},
-					{
-						"internalType": "bool",
-						"name": "isUploading",
-						"type": "bool"
-					},
-					{
-						"internalType": "bool",
-						"name": "isPenalty",
-						"type": "bool"
-					}
-				],
-				"internalType": "struct EHR.User",
-				"name": "",
-				"type": "tuple"
-			}
-		],
+		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -181,6 +153,73 @@
 				"internalType": "address",
 				"name": "dataOwner",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			}
+		],
+		"name": "getCid",
+		"outputs": [
+			{
+				"internalType": "bytes",
+				"name": "",
+				"type": "bytes"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "dataOwner",
+				"type": "address"
+			}
+		],
+		"name": "getDataNamesGrant",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "dataOwner",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "dataUser",
+				"type": "address"
+			}
+		],
+		"name": "getDataNamesRetrieve",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "dataOwner",
+				"type": "address"
 			}
 		],
 		"name": "getPermission",
@@ -195,19 +234,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "getWaitingList",
-		"outputs": [
-			{
-				"internalType": "address[]",
-				"name": "",
-				"type": "address[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -218,6 +244,11 @@
 				"internalType": "address",
 				"name": "dataUser",
 				"type": "address"
+			},
+			{
+				"internalType": "string[]",
+				"name": "names",
+				"type": "string[]"
 			}
 		],
 		"name": "grantPermission",
@@ -228,29 +259,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "index",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "_userRole",
-				"type": "string"
-			},
-			{
-				"internalType": "bool",
-				"name": "is_approved",
-				"type": "bool"
-			}
-		],
-		"name": "registerConfirm",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "dataOwner",
 				"type": "address"
@@ -259,17 +267,22 @@
 				"internalType": "address",
 				"name": "dataUser",
 				"type": "address"
+			},
+			{
+				"internalType": "string[]",
+				"name": "names",
+				"type": "string[]"
 			}
 		],
 		"name": "retrieve",
 		"outputs": [
 			{
-				"internalType": "bytes",
+				"internalType": "bytes[]",
 				"name": "",
-				"type": "bytes"
+				"type": "bytes[]"
 			}
 		],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -321,9 +334,14 @@
 				"type": "address"
 			},
 			{
-				"internalType": "bytes",
-				"name": "_cid",
-				"type": "bytes"
+				"internalType": "string[]",
+				"name": "names",
+				"type": "string[]"
+			},
+			{
+				"internalType": "bytes[]",
+				"name": "cids",
+				"type": "bytes[]"
 			}
 		],
 		"name": "updateUploadingResult",
@@ -355,9 +373,9 @@
 		"name": "users",
 		"outputs": [
 			{
-				"internalType": "bytes",
-				"name": "cid",
-				"type": "bytes"
+				"internalType": "uint8",
+				"name": "lastModified",
+				"type": "uint8"
 			},
 			{
 				"internalType": "string",

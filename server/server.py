@@ -85,8 +85,10 @@ async def upload_result(sid, data):
         _ipfsAccount = recover(data["info"], data["sig"])
         if _ipfsAccount == ipfsAccount:
             try:
-                encryptedCid = key.encrypt(info["cid"].encode('utf-8'))
-                ehr.functions.updateUploadingResult(info["address"], encryptedCid).transact()
+                (names, cids) = info["results"]
+                for i in range(len(names)):
+                    cids[i] = key.encrypt(cids[i].encode('utf-8'))
+                ehr.functions.updateUploadingResult(info["address"], names, cids).transact()
             except (OverflowError, exceptions.ContractLogicError) as err:
                 # The message is too big to encrypt it or a transaction error.
                 await sio.emit('upload_result', {'result': False, 'err': str(err)}, room=userSid)
@@ -115,18 +117,22 @@ async def retrieve_request(sid, data):
     if not ipfsSocket.connected:
         ipfsSocket.connect('http://127.0.0.1:8088')
 
-    userAddress = recover(data["info"], data["sig"])
     info = json.loads(data["info"])
+    userAddress = recover(data["info"], data["sig"])
+    targetAddress = info["target"]
     try:
-        encryptedCid = ehr.functions.retrieve(info["target"], userAddress).call()
-        cid = key.decrypt(encryptedCid)
-
-        info = {'cid': cid.decode('utf-8'), 'timestamp': timestamp(), 'address': userAddress}
+        encryptedCids = ehr.functions.retrieve(info["target"], userAddress, info["names"]).call()
+        cids = []
+        print(info["names"])
+        for encryptedCid in encryptedCids:
+            if encryptedCid == b'':
+                continue
+            cids.append(key.decrypt(encryptedCid).decode('utf-8'))
+        info = {'cids': cids, 'names': info["names"], 'timestamp': timestamp(), 'address': userAddress}
         info_json, sig = sign(info, ehrAccount)
-
         ipfsSocket.emit('retrieve', {'result': True, 'info': info_json, 'sig': sig})
         sidDict[userAddress] = sid
-        ehr.functions.retrieveResult(info["target"], userAddress, False).transact()
+        ehr.functions.retrieveResult(targetAddress, userAddress, False).transact()
         printLog('retrieve', {'address': userAddress, 'result': True})
     except exceptions.ContractLogicError as err:
         # The user isn't registered or doesn't have data(CID) or the data user has penalty.
@@ -142,13 +148,18 @@ async def retrieve_result(sid, data):
 
     :param data: {info: {timestamp, address: user address}, sig: signature, data: encrypted data}
     """
-    _ipfsAccount = recover(data["info"], data["sig"])
-    if _ipfsAccount == ipfsAccount:
+    _ipfsAddress = recover(data["info"], data["sig"])
+    if _ipfsAddress == ipfsAccount:
         info = json.loads(data["info"])
         try:
-            original_data = key.decrypt(data["data"]).decode('utf-8')
-            original_data = original_data.replace("\\", "")[1:-1]
-            await sio.emit('retrieve_request_result', {'result': True, 'data': original_data},
+            encryptedDataList, names = data["data"]
+            originalDataList = []
+            for i, encryptedData in enumerate(encryptedDataList):
+                originalData = key.decrypt(encryptedData).decode('utf-8')
+                originalData = originalData.replace("\\", "")[1:-1]
+                originalDataList.append([names[i], originalData])
+
+            await sio.emit('retrieve_request_result', {'result': True, 'data': originalDataList},
                            room=sidDict[info["address"]])
             printLog('retrieve_result', {'result': True})
 
@@ -158,6 +169,26 @@ async def retrieve_result(sid, data):
             printLog('retrieve_result', {'result': False, 'err': str(err)})
 
         del sidDict[info["address"]]
+
+
+@sio.event
+async def get_data_name(sid, data):
+    userAddress = recover(data["info"], data["sig"])
+    info = json.loads(data["info"])
+    try:
+        if info["type"] == 'grant':
+            dataList = ehr.functions.getDataNamesGrant(userAddress).call()
+        else:
+            dataList = ehr.functions.getDataNamesRetrieve(info["target"], userAddress).call()
+            dataList = dataList[0:indexOf('', dataList)]
+        if len(dataList) == 0:
+            raise Errors.NoElementError
+        await sio.emit('get_data_name_result', {'result': True, 'type': info["type"], 'data': dataList})
+        printLog('get_data_name_result', {'result': True})
+
+    except (exceptions.ContractLogicError, Errors.NoElementError) as err:
+        await sio.emit('get_data_name_result', {'result': False, 'type': info["type"], 'err': str(err)})
+        printLog('get_data_name_result', {'result': False, 'type': info["type"], 'err': str(err)})
 
 
 @sio. event
@@ -171,7 +202,7 @@ async def grant_permission(sid, data):
     userAddress = recover(data["info"], data["sig"])
     try:
         info = json.loads(data["info"])
-        ehr.functions.grantPermission(userAddress, info["target"]).transact()
+        ehr.functions.grantPermission(userAddress, info["target"], info["names"]).transact()
         await sio.emit('grant_result', {'result': True}, room=sid)
         printLog('grant_permission', {'address': userAddress, 'result': True})
     except exceptions.ContractLogicError as err:

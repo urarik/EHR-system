@@ -1,31 +1,48 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-    </head>
-    <body>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
     <script src="./ehrbundle.js"></script>
     <script>
-        async function prepare_retrieve() {
-            var info = {}, accountNum;
-            targetAccountNum = document.getElementById('num').value;
-            info.target = await getAddress(targetAccountNum)
-            accountNum = parseInt(document.getElementById('address').value);
-            send_message(info, accountNum, "retrieve_request");
+      async function prepare_retrieve(type) {
+        var info = {},
+          accountNum;
+        var targetNum = document.getElementById("target").value;
+        info.target = await getAddress(targetNum);
+        accountNum = parseInt(document.getElementById("num").value);
+
+        if(type == "retrieve_button") {
+          var names = [];
+          var div = document.getElementById('div_retrieve');
+          var divChks = div.getElementsByTagName('input');
+          for(var i =0; i < divChks.length; ++i) {
+            if(divChks[i].checked) {
+              names.push(document.getElementById('span_retrieve'+i).innerHTML);
+            }
+          }
+          info.names = names;
+          send_message(info, accountNum, "retrieve_request");
         }
+        else{
+          info.type = 'retrieve'; //grant or receive
+          send_message(info, accountNum, "get_data_name");
+        }
+      }
     </script>
-        <div style="text-align: center; padding:100px;">
-            타겟 계정 번호 :      <input type="text" id="num" value="1"/> <br />
-            계정 번호 :      <input type="text" id="address" value="2"/> <br />
+    <div style="text-align: center; padding: 100px">
+      타겟 계정 번호 : <input type="text" id="target" value="1" /> <br />
+      계정 번호 : <input type="text" id="num" value="2" /> <br />
 
-            <br />
-                    <button class="btn btn-default" id="retrieve_button" type="button"
-                    onClick="prepare_retrieve()">요청!</button>
-            <br />
-            <span id="retrieve-result-text"></span>
-
-
-        </div>
-    </body>
+      <br />
+      <div id="div_retrieve">
+      </div>
+      <button class="btn btn-default" id="get_retrieve_button" type="button" onClick="prepare_retrieve(this.id)"> 로드!</button>
+      <button class="btn btn-default" id="retrieve_button" type="button" onClick="prepare_retrieve(this.id)"/> 요청!</button>
+      <br />
+      <span id="retrieve-result-text"></span>
+    </div>
+  </body>
 </html>

@@ -1,33 +1,42 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-    </head>
-    <body>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
     <script src="./ehrbundle.js"></script>
     <script>
-        function prepare_upload() {
-            var info = {}, accountNum;
+      function prepare_upload() {
+        var info = {}, accountNum;
+        accountNum = parseInt(document.getElementById("num").value);
+        send_message(info, accountNum, "upload_request");
 
-            accountNum = parseInt(document.getElementById('num').value);
-
-            send_message(info, accountNum, "upload_request");
-        }
+      }
     </script>
-        <div style="text-align: center; padding:100px;">
-            이름 :      <input type="text" id="name" value="Sara"/> <br />
-            위험도 :    <input type="text" id="level" value="35"/> <br />
-            전화번호 :  <input type="text" id="phone" value="010-2342-1932"/> <br />
-            생일 :      <input type="text" id="birthday" value="03/04/1900"/> <br />
-            _계정 번호 :      <input type="text" id="num" value="1"/> <br />
-            
-            <br />
-                    <button class="btn btn-default" id="upload_button" type="button"
-                    onClick="prepare_upload()">업로드!</button>
-            <br />
-            <span id="upload-result-text"></span>
+    <div style="text-align: center; padding: 100px">
+      데이터1 :
+      <input type="text" id="data1" value="data1" style="width: 100px" />
+      <input type="file" id="file1" /> <br />
+      데이터2 :
+      <input type="text" id="data2" value="data2" style="width: 100px" />
+      <input type="file" id="file2" /> <br />
+      데이터3 :
+      <input type="text" id="data3" value="data3" style="width: 100px" />
+      <input type="file" id="file3" /> <br />
+      계정 번호 : <input type="text" id="num" value="1" /> <br />
 
-        </div>
-    </body>
+      <br />
+      <button
+        class="btn btn-default"
+        id="upload_button"
+        type="button"
+        onClick="prepare_upload()"
+      >
+        업로드!
+      </button>
+      <br />
+      <span id="upload-result-text"></span>
+    </div>
+  </body>
 </html>
