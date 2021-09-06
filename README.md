@@ -27,6 +27,7 @@ You can load files you uploaded and then grant permission to target user for eac
 <img width="80%" src="https://user-images.githubusercontent.com/81351772/132211881-51f8ced7-ff85-4799-bb9b-d8a0879a9ec6.png"/><br/><br/>
 \<retrieve\><br/><br/>
 You can see data names allowed by owner and then see the contents you checked.
+In this screenshot, the data owner only accepts data1 and data3 to the user.
 <img width="80%" src="https://user-images.githubusercontent.com/81351772/132211885-b54abeec-64a7-4974-9ca0-0dade0d40a1a.png"/><br/><br/>
 <img width="80%" src="https://user-images.githubusercontent.com/81351772/132211888-b91fc251-6ec4-42dd-9bb4-c4e4dd6ee1f4.png"/><br/><br/>
 \<log\><br/><br/>
